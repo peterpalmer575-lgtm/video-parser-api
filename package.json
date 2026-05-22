@@ -1,0 +1,23 @@
+{
+  "name": "video-watermark-remover",
+  "version": "1.0.0",
+  "description": "视频去水印解析API - 支持抖音、快手、小红书等平台",
+  "main": "api/parse.js",
+  "scripts": {
+    "start": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "video",
+    "watermark",
+    "remover",
+    "douyin",
+    "kuaishou",
+    "xiaohongshu"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "https": "^1.0.0"
+  }
+}

@@ -1,0 +1,71 @@
+<!--pages/index/index.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">视频去水印工具</text>
+    <text class="subtitle">支持抖音、快手、小红书等平台</text>
+  </view>
+
+  <view class="input-section">
+    <view class="input-wrapper">
+      <input 
+        class="url-input" 
+        placeholder="请粘贴视频链接" 
+        value="{{videoUrl}}"
+        bindinput="onInputChange"
+        placeholder-style="color: #999;"
+      />
+      <view class="clear-btn" wx:if="{{videoUrl}}" bindtap="onClearInput">✕</view>
+    </view>
+    
+    <button class="parse-btn" bindtap="onParseVideo" loading="{{loading}}">
+      {{loading ? '解析中...' : '开始解析'}}
+    </button>
+  </view>
+
+  <view class="result-section" wx:if="{{result}}">
+    <view class="result-card">
+      <image class="cover" src="{{result.cover}}" mode="aspectFill" wx:if="{{result.cover}}"></image>
+      <view class="info">
+        <text class="result-title">{{result.title || '视频标题'}}</text>
+        <text class="author">作者: {{result.author || '未知'}}</text>
+        <text class="platform">平台: {{result.type === 'douyin' ? '抖音' : result.type === 'kuaishou' ? '快手' : '小红书'}}</text>
+      </view>
+      
+      <view class="actions">
+        <button class="download-btn" bindtap="onDownloadVideo" wx:if="{{result.video_url}}">
+          下载视频
+        </button>
+        <button class="copy-btn" bindtap="onCopyLink" wx:if="{{result.video_url}}">
+          复制链接
+        </button>
+      </view>
+      
+      <view class="message" wx:if="{{result.message}}">
+        <text>{{result.message}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="error-section" wx:if="{{error}}">
+    <view class="error-card">
+      <text class="error-text">{{error}}</text>
+    </view>
+  </view>
+
+  <view class="tips-section">
+    <text class="tips-title">使用说明：</text>
+    <text class="tips-item">1. 复制视频分享链接（打开视频 -> 点击分享 -> 复制链接）</text>
+    <text class="tips-item">2. 粘贴到上方输入框</text>
+    <text class="tips-item">3. 点击"开始解析"按钮</text>
+    <text class="tips-item">4. 解析成功后即可下载无水印视频</text>
+  </view>
+
+  <view class="supported-platforms">
+    <text class="platform-title">支持的平台：</text>
+    <view class="platform-list">
+      <text class="platform-tag">抖音</text>
+      <text class="platform-tag">快手</text>
+      <text class="platform-tag">小红书</text>
+    </view>
+  </view>
+</view>
