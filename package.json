@@ -1,8 +1,0 @@
-{
-  "name": "video-parser-api",
-  "version": "1.0.0",
-  "description": "视频去水印解析API",
-  "dependencies": {
-    "axios": "^1.6.8"
-  }
-}
