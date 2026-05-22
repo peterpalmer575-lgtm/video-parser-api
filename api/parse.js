@@ -1,6 +1,7 @@
 const axios = require('axios');
 
 module.exports = async (req, res) => {
+  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -8,8 +9,19 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ success: false, message: '只支持POST请求' });
 
-  const { url } = req.body;
-  if (!url) return res.status(400).json({ success: false, message: '请提供视频链接' });
+  // 兼容多种body格式
+  let url = '';
+  if (req.body) {
+    url = req.body.url || '';
+  }
+  // 也支持query参数
+  if (!url && req.query && req.query.url) {
+    url = req.query.url;
+  }
+
+  if (!url) {
+    return res.status(200).json({ success: false, message: '请提供视频链接', debug: { hasBody: !!req.body, bodyKeys: req.body ? Object.keys(req.body) : [], query: req.query } });
+  }
 
   try {
     const u = url.toLowerCase();
@@ -24,17 +36,17 @@ module.exports = async (req, res) => {
     } else if (u.includes('bilibili.com') || u.includes('b23.tv')) {
       result = await parseBilibili(url);
     } else {
-      return res.status(400).json({ success: false, message: '不支持该平台，支持：抖音、快手、小红书、B站' });
+      return res.status(200).json({ success: false, message: '不支持该平台，支持：抖音、快手、小红书、B站' });
     }
 
     if (result && result.videoUrl) {
       res.json({ success: true, data: result });
     } else {
-      res.status(400).json({ success: false, message: '解析失败，请检查链接是否正确' });
+      res.status(200).json({ success: false, message: '解析失败，请检查链接是否正确' });
     }
   } catch (err) {
     console.error('解析错误:', err.message);
-    res.status(500).json({ success: false, message: '服务器错误：' + err.message });
+    res.status(200).json({ success: false, message: '服务器错误：' + err.message });
   }
 };
 
@@ -48,11 +60,9 @@ async function parseDouyin(url) {
   });
 
   const finalUrl = resp.request?.res?.responseUrl || url;
-  let videoId = '';
   const m = finalUrl.match(/\/video\/(\d+)/);
-  if (m) videoId = m[1];
+  const videoId = m ? m[1] : '';
 
-  if (!videoId) throw new Error('无法提取抖音视频ID，请检查链接');
   if (!videoId) throw new Error('无法提取抖音视频ID，请检查链接');
 
   const apiResp = await axios.get(`https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=${videoId}`, {
@@ -77,14 +87,6 @@ async function parseDouyin(url) {
 
 // ============ 快手解析 ============
 async function parseKuaishou(url) {
-  const resp = await axios.get(url, {
-    headers: { 'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)' },
-    maxRedirects: 10,
-    validateStatus: () => true,
-    timeout: 10000
-  });
-
-  const html = typeof resp.data === 'string' ? resp.data : JSON.stringify(resp.data);
   const photoIdMatch = url.match(/\/short-video\/([A-Za-z0-9_-]+)/) || url.match(/photoId=([A-Za-z0-9_-]+)/);
   const photoId = photoIdMatch ? photoIdMatch[1] : '';
 
@@ -160,7 +162,6 @@ async function parseBilibili(url) {
 
   const d = resp.data.data;
 
-  // 获取播放地址
   const cidResp = await axios.get(`https://api.bilibili.com/x/player/playurl?bvid=${bvid}&cid=${d.cid}&qn=80&fnval=1`, {
     headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.bilibili.com/' },
     timeout: 10000
