@@ -29,6 +29,8 @@ app.get('/', (req, res) => {
   res.send('视频去水印后端服务运行正常');
 });
 
-app.listen(port, () => {
-  console.log(`服务启动端口:${port}`);
-});
+- app.listen(port, () => {
+-   console.log(`服务启动端口:${port}`);
+- });
++ // Vercel Serverless 导出
++ module.exports = app;
