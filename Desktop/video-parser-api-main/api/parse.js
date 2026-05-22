@@ -1,7 +1,6 @@
 const axios = require('axios');
 
-// Vercel Serverless Function
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -47,7 +46,7 @@ module.exports = async (req, res) => {
     console.error('解析错误:', error.message);
     res.status(500).json({ success: false, message: '服务器错误：' + error.message });
   }
-};
+}
 
 // 抖音解析
 async function parseDouyin(url) {

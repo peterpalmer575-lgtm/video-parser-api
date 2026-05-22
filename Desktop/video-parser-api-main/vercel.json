@@ -1,1 +1,1 @@
-{"version": 2, "routes": [{"src": "/api/parse", "dest": "/api/parse.js"}, {"src": "/(.*)", "dest": "/index.js"}]}
+{"version": 2}
