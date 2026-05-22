@@ -1,9 +1,11 @@
 {
   "version": 2,
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/parse.js"
+  "functions": {
+    "api/parse.js": {
+      "runtime": "nodejs20.x"
     }
+  },
+  "rewrites": [
+    { "source": "/api/parse", "destination": "/api/parse.js" }
   ]
 }
